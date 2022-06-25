@@ -23,7 +23,7 @@ Vamos a usar Conda para construir un entorno virtual nuevo.
  
 ### 1. Creando el entorno virtual (Virtual Environment)
  
-Asumiremos que tenemos instalado conda. El primer paso es crear un nuevo enviroment para desarrollar. Para crear uno usando Python 3.7 debemos ejecutar el siguiente comando:
+Asumiremos que tenemos instalado conda. El primer paso es crear un nuevo enviroment para desarrollar. Para crear uno usando Python 3.8 debemos ejecutar el siguiente comando:
  
 ```bash
 conda create --name pd-mds-2022-lab python=3.8
