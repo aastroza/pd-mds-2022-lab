@@ -8,7 +8,7 @@ Para comenzar deben haber bajado todos los archivos a una carpeta y en el termin
 .
 └── pd-mds-2022-lab (este directorio)
     ├── model (acá irán nuestros modelos)
-    ├── 00_nyc-taxi-model.ipynb ()
+    ├── 00_nyc-taxi-model.ipynb
     ├── 01_server.ipynb
     ├── 02_client.ipynb
     └── requirements.txt (dependencias de Python)
