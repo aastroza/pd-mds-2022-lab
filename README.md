@@ -50,7 +50,7 @@ Este comando puede demorar un rato dependiendo de la velocidad del computador y 
 Luego debemos enlazar el kernel de jupyter lab a nuestro nuevo enviroment:
 
 ```bash
-python -m ipykernel install --user --name cenv
+python -m ipykernel install --user --name pd-mds-2022-lab
 ```
 
  
