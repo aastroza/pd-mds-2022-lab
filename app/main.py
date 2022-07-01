@@ -67,3 +67,4 @@ def prediction(item: Item, confidence: float):
 
 
 
+# Comentario para iniciar prueba de CI/CD
