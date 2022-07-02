@@ -5,7 +5,7 @@ from sklearn.metrics import f1_score
 def test_accuracy():
 
     # Load test data
-    taxi_test = pd.read_csv('./data/yellow_tripdata_2020-05_test.csv')
+    taxi_test = pd.read_csv('./data/yellow_tripdata_2020-03_test.csv')
 
     numeric_feat = [
     "pickup_weekday",
