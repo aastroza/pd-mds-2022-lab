@@ -77,44 +77,40 @@ Para esta parte debemos hacer un [fork](https://docs.github.com/en/get-started/q
 
 ### ¿Qué es GH Actions?
 
-This is an amazing tool that allows you to define automatic workflows for specific events within a GH repo. For instance you can create Python script versions of all your Jupyter notebooks every time you push or pull changes from the remote repository.
+Es una herramienta sensacional que permite definir flujos de trabajo automáticos para eventos específicos dentro de un repositorio de GitHub. 
 
-In this lab you will set up an action that will run the unit tests defined for your code every time you push changes to the remote repo.
-
-To give you an idea of the flexibility of this tool, you could also (although not covered in this lab) set the action to build a Docker image out of your code if all the unit tests were passed and sent that image to a Google Cloud Bucket where it can be used to deploy your code. This would mean that you successfully automated your deployment with every push of changes.
+Vamos a preparar una acción que corra test unitarios definidos en el código cada vez que mandemos cambios al repositorio remoto.
 
 
-## Fork the public repo
+### Fork el repositorio público
 
-Forking a repo is simply creating your own copy of it. It is often used in Open Source development as a way of keeping everything tidy. Instead of working directly on a public repo (in which you probably won't have writing access) you can work on your fork and submit Pull Requests from it. To fork a repo just click on the `Fork` button on the top right corner of the repo:
+Hacer fork a un repositorio es simplemente crear una versión propia de este. Se usa bastante en el desarrollo de software Open Source para organizar una forma de trabajar colaborativamente. En vez de usar el mismo repositorio público (en el que probablemente no se tenga acceso de escritura) se puede trabajar en el fork y mandar Pull Requests desde ahí. Para hacer un fork de este repo sólo se debe clickear en el botón `Fork` en la esquina superior derecha:
 
 ![fork-repo](assets/fork-repo.PNG)
 
-
-Once the forking process has been completed you should have a copy of the repo registered under your username, like this:
+Una vez que el proceso de fork haya terminado, deberíamos tener una copia del repositorio pero registrada bajo nuestro propio nombre de usuario:
 
 ![your-fork](assets/your-fork.PNG)
 
-Now you need to clone it into your local machine. You can do so by using these commands (be sure to replace the username used here for your own):
+Ahora necesitamos clonarlo a nuestra máquina local. Se puede hacer mediante [GitHub Desktop](https://desktop.github.com/) o usando este comando (ojo que hay que reemplazar el username por el propio):
 
 ```bash
 git clone https://github.com/your-username/pd-mds-2022-lab.git
 ```
 
-
-Now you need to enable Actions for your fork. You can do so by clicking on the Actions button:
+Ahora hay que habilitar las Asctions en el fork. Se puede hacer haciendo click en el botón Actions:
 
 ![action-button](assets/action-button.PNG)
 
-And clicking the green button to enable Actions:
+Y luego haciendo click en el botón verde:
 
 ![enable-actions](assets/enable-actions.PNG)
 
-## Navigating the fork
+### Navegando en el fork
 
-Now `cd` into your fork. You can do so by using the command `cd machine-learning-engineering-for-production-public` while on the directory that contains your fork.
+Ahora revisemos lo que hay en el repositorio.
 
-Before jumping to the directory with the files for this lab, notice a hidden folder in the root of the repo called `.github`. Within there is another directory called `workflows`, here is where all of the files for configuring Actions should be placed. These files should be in `YAML` format. In this case you should encounter a file called `course4-week3-lab.yml` that will be responsible for setting up your desired action of running unit tests. For convenience the contents of the file are placed here:
+Notemos que hay un directorio oculto en la raíz del repositorio que se llama `.github`. Dentro hay otro directorio llamado `workflows`, aquí se ponen todos los archivos necesarios para configurar las Actions. Estos archivos deben estar en formato `YAML`. En este caso debemos encontrarnos con uno llamado `pd-mds-2022-lab.yml` que será responsable de configurar la acción que deseamos corra el test unitario. El contenido de este archivo es el siguiente:
 
 ```yml
 # Run unit tests for your Python application
@@ -162,7 +158,7 @@ jobs:
           pytest
 ```
 
-Wow that is a long file. Let's break it down piece by piece (notice that comments are trimmed to keep the snippets short but they also provide important information so be sure to read them if you don't understand something):
+Veamos cada parte de este archivo:
 
 ```yml
 name: PD-MDS-Lab
@@ -172,7 +168,7 @@ on:
       - 'app/**'
 ```
 
-In this first part you need to define a name for your Action so you can differentiate it from other ones. After this you need to specify what will trigger it, in this case the Action will be run automatically with a **push** that has changes to any file within the `course4/week3-ungraded-labs/C4_W3_Lab_4_Github_Actions` directory.
+Acá se define un nombre para la Action para poder diferenciarla de otras. Además se específica que la disparará, en este caso será por cualquier **push** que cambie algún archivo dentro del directorio `app/`.
 
 ```yml
 jobs:
@@ -183,7 +179,7 @@ jobs:
         shell: bash
 ```
 
-In the next part you need to define all of the jobs than will run when this action is triggered. In this case you only need one job, which will be named `test` and will run in an environment that uses the latest release of Ubuntu. You can also define some default behavior for the job such as the desired shell, `bash` in this case, and the working directory within the repo. This means that the action will run as it had `cd` into the `course4/week3-ungraded-labs/C4_W3_Lab_4_Github_Actions/` directory first.
+En la siguiente parte se define que trabajos o tareas (`jobs`) deben ejecutarse cuando se dispare esta Action. En este caso es solo un `job`, que se llama `test` y que se ejecutará en un ambiente con el último release de Ubuntu. Además se puede definir algún comportamiento por defecto para este `job`, como el shell (intérprete de comandos) deseado, en este caso `bash`.
 
 ```yml
     steps:
@@ -207,11 +203,14 @@ In the next part you need to define all of the jobs than will run when this acti
           pytest
 ```
 
-Finally you need to specify the `steps` for this action to be completed. This is a sequence of commands to achieve the functionality you strive for.  `steps` have several values associated such as:
-- `name`: The name of the step.
+Finalmente hay que definir pasos o etapas (`steps`) para que está Action se complete. Son secuencias de comandos que logren alcanzar la funcionalidad deseada. `steps` tiene varios parámetros asociados como:
+
+- `name`: el nombre del paso.
 
 - `uses`: You can specify an already existing `Action` as an step on one of your own. This is pretty cool because it allows for reutilization of Actions. 
+
 - `run`: Instead of using an existing Action you might need to run a command. Since you are using `bash` inside a Linux VM, these commands should follow the correct syntax.
+
 - `with`: You might need to specify some additional values. This field is for such cases.
 
 
@@ -220,7 +219,9 @@ Let's understand every step in order:
 - The first step uses the `actions/checkout@v2` Action. This is usually included in every Action since it allows GitHub to access or check-out your repo.
 
 - Now that your repo has been checked-out, you need to set an environment capable of running your Python code. To accomplish this the `actions/setup-python@v2` Actions is used while specifying the desired Python version.
+
 - Having a Python supported environment it is time to install of the dependencies that your application needs. You can do so by using upgrading `pip` and then using it to install the dependencies listed in the `requirements.txt` file.
+
 - Finally you can run your unit tests by simply using the `pytest` command. Notice that you needed to `cd` into the `app` directory first.
 
 Now that you have a better sense of how to configure Actions it is time to put them to test.
@@ -231,7 +232,7 @@ Within the `app` directory a copy of the server that serves predictions for the 
 
 ### Unit testing with pytest
 
-To perform unit testing you will use the `pytest` library. When using this library you should place your tests within a Python script that starts with the prefix `test_`, in this case it is called `test_clf.py` as you will be testing the classifier. 
+To perform unit testing you will use the `pytest` library. When using this library you should place your tests within a Python script that starts with the prefix `test_`, in this case it is called `test_rfc.py` as you will be testing the classifier. 
 
 Let's take a look at the contents of this file:
 
