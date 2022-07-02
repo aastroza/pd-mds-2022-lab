@@ -207,21 +207,124 @@ Finalmente hay que definir pasos o etapas (`steps`) para que está Action se com
 
 - `name`: el nombre del paso.
 
-- `uses`: You can specify an already existing `Action` as an step on one of your own. This is pretty cool because it allows for reutilization of Actions. 
+- `uses`: se puede especificar una `Action` que ya exista como un paso. 
 
-- `run`: Instead of using an existing Action you might need to run a command. Since you are using `bash` inside a Linux VM, these commands should follow the correct syntax.
+- `run`: en vez de utilizar una Action que ya exista también puede que se desee correr un comando. Dado que acá usamos `bash` dentro de una máquina virtual Linux, estos comandos deben tener la sintaxis adecuada.
 
-- `with`: You might need to specify some additional values. This field is for such cases.
+- `with`: se usa si es que se necesita especificar parámetros adicionales.
 
 
-Let's understand every step in order:
+Para entender cada paso:
 
-- The first step uses the `actions/checkout@v2` Action. This is usually included in every Action since it allows GitHub to access or check-out your repo.
+- El primer paso usa la Action `actions/checkout@v2`. Esto suualmente se incluye en todas las Action ya que permite a GitHub tener aceso o hacer check-put del repo.
 
-- Now that your repo has been checked-out, you need to set an environment capable of running your Python code. To accomplish this the `actions/setup-python@v2` Actions is used while specifying the desired Python version.
+- Ahora que se hizo un check-out del repo, se debe configurar un ambiente capaz de correr código en Python. Para cumplir esto usamos la Action  `actions/setup-python@v2` especificando la versión de Python que necesitamos.
 
-- Having a Python supported environment it is time to install of the dependencies that your application needs. You can do so by using upgrading `pip` and then using it to install the dependencies listed in the `requirements.txt` file.
+- Teniendo ya el ambiente Python necesitamos instalar las depencias. Podemos hacerlo haciendo upgrade a `pip` y usarlo para instalar las depencias listadas en el archivo `requirements.txt`.
 
-- Finally you can run your unit tests by simply using the `pytest` command. Notice that you needed to `cd` into the `app` directory first.
+- Finalmente podemos correr la prueba unitaria usando el comando `pytest`. Notemos que primero debemos hacer un `cd` para entrar al directorio `app`.
 
-Now that you have a better sense of how to configure Actions it is time to put them to test.
+Ahora que entendemos de mejor forma lo que hace un GH Action, podemos ponerlas a prueba.
+
+
+### Probando el pipeline CI/CD
+
+Dentro del directorio `app` hay una copia del programa servidor que entrega predicciones sobre los viajes en taxi. El código se encarga de cargar el clasificador en el estado global incluso antes de comenzar el server. Esto es porque queremos hacer test unitarios antes de comenzar siquiera el servicio.
+
+#### Test unitario con pytest
+
+Para realizar el test unitario usaremos la biblioteca `pytest`. Para usarla debemos poner nuestros test en scripts de Python donde el nombre de archivo empiece por el prefijo `test_`, en este caso se llama `test_rfc.py` ya que probaremos el desempeño del clasificador Random Forest. 
+
+Miremos el contenido de este archivo:
+
+```python
+import pandas as pd
+from main import rfc
+from sklearn.metrics import f1_score
+
+def test_accuracy():
+
+    # Load test data
+    taxi_test = pd.read_csv('./data/yellow_tripdata_2020-03_test.csv')
+
+    numeric_feat = [
+    "pickup_weekday",
+    "pickup_hour",
+    'work_hours',
+    "pickup_minute",
+    "passenger_count",
+    'trip_distance',
+    'trip_time',
+    'trip_speed'
+    ]
+    categorical_feat = [
+        "PULocationID",
+        "DOLocationID",
+        "RatecodeID",
+    ]
+
+    features = numeric_feat + categorical_feat
+    target_col = "high_tip"
+
+    # Predict test examples
+    preds_test = rfc.predict_proba(taxi_test[features])
+    preds_test_labels = [p[1] for p in preds_test.round()]
+
+    # Compute f1-score of classifier
+    f1 = f1_score(taxi_test[target_col], preds_test_labels)
+
+
+    # f1-score should be over 0.7
+    assert f1 > 0.7
+```
+
+Hay solo una prueba unitaria definida en el método `test_accuracy`. Esta función carga los datos de test guardados en el archivo `data/yellow_tripdata_2020-03_test.csv` correspondiente a la muestra de viajes de marzo de 2020. Luego se usan estos datos para calcular el f1-score sobre los datos de prueba. 
+
+Si el f1-score es mayor a 0.7 la prueba se pasa exitosamente. De otra forma, falla.
+
+### Corriendo la GitHub Action
+
+Para correr el test unitario usando el pipeline CI/CD necesitamos hacer cambios en el repositorio remoto, específicamente en el directorio `app/`. Para hacer esto, **agreguemos un comentario dentro del archivo `main.py` y guardemos los cambios**.
+
+Ahora debemos usar git para hacer pull de los cambios hace la versión remota de nuestro fork.
+
+- Primero se verifica si hubo cambios usando el comando `git status`. Deberíamos ver el archivo `main.py` en la lista.
+
+- Ahora hay que hacer stage de todos los cambios usando `git add --all`.
+- Crear un commit con el comando `git commit -m "Testing the CI/CD pipeline"`. 
+- Finalmente hacer push de los cambios usando `git push origin main`.
+
+Con este push el pipeline CI/CD debe haber sido disparado. Para verlo en acción debemos visitar el repo fork usando un navegador y hacer click en el botón  `Actions`.
+
+
+Ahora podemos ver todo lo que ocurre mientras corre el flujo de trabajo que configuramos. Si luego de unos segundos volvemos a hacer click en el botón `Actions` podemos ver la lista de run acompañado con un íncono verde que muestra que todos los test fueron superados.
+
+
+¡Acabamos de ejecutar nuetro primer flujo de trabajo de CI/CD!
+
+### Corriendo el pipeline otra vez
+
+#### Cambiando el código
+
+Supongamos que el equipo de Data Science solicita estar siempre monitoreando el desempeño del clasificador usando datos de los días recientes. Simulemos ese comportamiento cambiando el archivo de los datos de test en el directorio `data/` modificando el script `test_rfc.py`. Hagamos el siguiente cambio para probar con datos de mayo de 2020:
+
+```python
+# Load test data
+    taxi_test = pd.read_csv('./data/yellow_tripdata_2020-03_test.csv')
+```
+
+Y lo modificamos a esto:
+
+```python
+# Load test data
+    taxi_test = pd.read_csv('./data/yellow_tripdata_2020-05_test.csv')
+```
+
+Una vez que guardamos los cambios, usamos git para hacer push con los mismos comandos de antes:
+
+- `git add --all`
+- `git commit -m "Adding new test data"`
+- `git push origin main`
+
+¿Qué es lo que ocurre? ¿Cómo podríamos solucionarlo?
+
