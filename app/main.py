@@ -65,5 +65,3 @@ def prediction(item: Item, confidence: float):
     # Retornar el resultado de la predicción
     return {'predicted_class': pred}
 
-
-#comentario de prueba
