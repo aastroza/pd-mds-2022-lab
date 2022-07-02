@@ -226,11 +226,11 @@ Let's understand every step in order:
 
 Now that you have a better sense of how to configure Actions it is time to put them to test.
 
-## Testing the CI/CD pipeline
+### Testing the CI/CD pipeline
 
 Within the `app` directory a copy of the server that serves predictions for the Wine dataset (that you used in a previous ungraded lab) is provided. The file is the same as in that previous lab with the exception that the classifier is loaded directly into global state instead of within a function that runs when the server is started. This is done because you will be performing unit tests on the classifier without starting the server.
 
-### Unit testing with pytest
+#### Unit testing with pytest
 
 To perform unit testing you will use the `pytest` library. When using this library you should place your tests within a Python script that starts with the prefix `test_`, in this case it is called `test_rfc.py` as you will be testing the classifier. 
 
@@ -281,7 +281,7 @@ There is only one unit test defined in the `test_accuracy` function. This functi
 
 If the accuracy is greater than 90% then the test passes. Otherwise it fails.
 
-## Running the GitHub Action
+### Running the GitHub Action
 
 To run the unit test using the CI/CD pipeline you need to push some changes to the remote repository. To do this, **add a comment somewhere in the `main.py` file and save the changes**.
 
@@ -295,29 +295,14 @@ Now you will use git to push changes to the remote version of your fork.
 With the push the CI/CD pipeline should have been triggered. To see it in action visit your forked repo in a browser and click the `Actions` button.
 
 
-Here you will see all of the runs of the workflows you have set up. Right now you should see a run that looks like this (notice that the name is the same as the commit message):
+Here you will see all of the runs of the workflows you have set up.  Click again on the `Actions` button to see the list of workflow runs and you should see the run accompanied by a green icon showing that all tests passed successfully:
 
-![workflow-run](../../assets/workflow-run.png)
-
-You can click on the name of this run to see a summary of the jobs that made it up. If you do so you will see there is only the job `test` that you defined in the `YAML` file:
-
-![job](../../assets/job.png)
-
-Now you can click once again the job to see a detailed list of all the steps of that job:
-
-![steps](../../assets/steps.png)
-
-Notice that these steps are the sames you defined in the configuration file plus some automatically added by GitHub.
-
-This Action takes around 40 seconds to complete so by now it should have finished. Click again on the `Actions` button to see the list of workflow runs and you should see the run accompanied by a green icon showing that all tests passed successfully:
-
-![good-run](../../assets/good-run.png)
 
 You just run your own CI/CD pipeline! Pretty cool!
 
-## Running the pipeline more times
+### Running the pipeline more times
 
-### Changing the code
+#### Changing the code
 
 Suppose a teammate tells you that the Data Science team has developed a new model with an accuracy of 95% (the current one has 91%) so you decide to use new model instead. It is found in the `models/wine-95.pkl` file so to use it in your webserver you need to modify `main.py`. You should change the following lines:
 
@@ -341,12 +326,12 @@ Once the change is saved, use git to push the changes as before. Use the followi
 
 With the push the CI/CD pipeline should have been triggered again. Once again go into the browser and check it. This time you will find that the tests failed. This can be done by the red icon next to the run:
 
-![bad-run](../../assets/bad-run.png)
+
 
 So, what happened?
 You can dig deeper by going into the job and then into the steps that made it up. You should see something like this:
 
-![error-detail](../../assets/error-detail.png)
+
 
 The unit test failed because this new model has an accuracy lower to 90%. This happened because due to some miscommunication between teams, the Data Science team did not provide a `sklearn.pipeline.Pipeline` which first step is a `sklearn.preprocessing.StandardScaler`, but only the model since they expected the test data to be already scaled.
 
@@ -356,4 +341,3 @@ In this lab you saw what GitHub Actions is, how it can be configured and how it 
 
 These pipelines are meant to run really quickly so you can iterate your code in an agile and safe way.
 
-**Keep it up!**
