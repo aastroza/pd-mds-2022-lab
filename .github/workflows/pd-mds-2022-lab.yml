@@ -19,8 +19,7 @@ jobs:
       run:
         # Use bash as the shell
         shell: bash
-        # Specify the working directory for the workflow
-        working-directory: app/
+
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -40,4 +39,5 @@ jobs:
       -
         name: Test with pytest
         run: |
+          cd app/
           pytest
