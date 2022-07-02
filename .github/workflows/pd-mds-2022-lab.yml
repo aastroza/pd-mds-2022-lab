@@ -20,7 +20,7 @@ jobs:
         # Use bash as the shell
         shell: bash
         # Specify the working directory for the workflow
-        working-directory: .app/
+        working-directory: app/
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
