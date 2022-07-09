@@ -13,7 +13,7 @@ from pydantic import BaseModel
 app = FastAPI(title='Implementando un modelo de Machine Learning usando FastAPI')
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-rfc = joblib.load("./static/model/random_forest.joblib")
+rfc = joblib.load("./model/random_forest.joblib")
 
 def predict_taxi_trip(features_trip, confidence=0.5):
     """Recibe un vector de características de un viaje en taxi en NYC y predice 
