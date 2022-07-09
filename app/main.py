@@ -4,11 +4,16 @@ import io
 import uvicorn
 import nest_asyncio
 from enum import Enum
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-rfc = joblib.load("./model/random_forest.joblib")
+# Asignamos una instancia de la clase FastAPI a la variable "app".
+# Interacturaremos con la API usando este elemento.
+app = FastAPI(title='Implementando un modelo de Machine Learning usando FastAPI')
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+rfc = joblib.load("./static/model/random_forest.joblib")
 
 def predict_taxi_trip(features_trip, confidence=0.5):
     """Recibe un vector de características de un viaje en taxi en NYC y predice 
@@ -25,9 +30,7 @@ def predict_taxi_trip(features_trip, confidence=0.5):
     else:
       return 0
 
-# Asignamos una instancia de la clase FastAPI a la variable "app".
-# Interacturaremos con la API usando este elemento.
-app = FastAPI(title='Implementando un modelo de Machine Learning usando FastAPI')
+
 
 # Creamos una clase para el vector de features de entrada
 class Item(BaseModel):
