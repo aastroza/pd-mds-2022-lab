@@ -13,3 +13,4 @@ pytest
 pyarrow
 fastparquet
 aiofiles
+uvloop
