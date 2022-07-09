@@ -11,7 +11,7 @@ from pydantic import BaseModel
 # Asignamos una instancia de la clase FastAPI a la variable "app".
 # Interacturaremos con la API usando este elemento.
 app = FastAPI(title='Implementando un modelo de Machine Learning usando FastAPI')
-app.mount("app/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 rfc = joblib.load("./static/model/random_forest.joblib")
 
