@@ -12,3 +12,4 @@ ipykernel
 pytest
 pyarrow
 fastparquet
+aiofiles
